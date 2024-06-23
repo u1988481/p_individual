@@ -1,23 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
-    <script type="module" src="./js/menu.js"></script>
-    <script type="module" src="./js/optionsScene.js"></script>
-    <script type="module" src="./js/gameScene.js"></script>
-    <script type="module" src="./js/mode2OptionsScene.js"></script>
-    <script type="module" src="./js/mode2Scene.js"></script>
-    <link rel="stylesheet" href="./styles/menu.css">
-    <title>Memory - Menú</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phaser Game</title>
+    <link rel="stylesheet" href="..\styles\menu.css">
 </head>
 <body>
     <div id="container">
-        <h1 id="title" class="center">Memory cards</h1>
-        <h1 id="subtitle" class="center">Menú</h1>
+        <h1 id="title">Memory Game</h1>
         <button id="play" class="center">Jugar</button>
-        <button id="saves" class="center">Partides</button>
-        <button id="exit" class="center">Sortir</button>
+        <button id="rankings" class="center">Puntuacions</button>
+        <button id="load" class="center">Carregar</button>
     </div>
-    <div id="game-container" style="display: none;"></div>
+    <div id="game-container"></div>
+    <script src="library\jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
+    <script src="js\menu.js" type="module"></script>
 </body>
 </html>
