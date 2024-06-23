@@ -1,5 +1,7 @@
 import { OptionsScene } from './optionsScene.js';
 import { GameScene } from './gameScene.js';
+import { Mode2OptionsScene } from './mode2OptionsScene.js'; // Import Mode 2 Options Scene
+import { Mode2Scene } from './mode2Scene.js'; // Import Mode 2 Scene
 
 document.addEventListener('DOMContentLoaded', function() {
     const playButton = document.getElementById('play');
@@ -35,12 +37,14 @@ document.addEventListener('DOMContentLoaded', function() {
         mode1Button.addEventListener('click', function() {
             container.style.display = 'none';
             gameContainer.style.display = 'block';
-            startGame();
+            startGame('OptionsScene'); // Start the regular game
         });
 
         // Add event listener to Mode 2 button
         mode2Button.addEventListener('click', function() {
-            console.log('Mode 2 clicked');
+            container.style.display = 'none';
+            gameContainer.style.display = 'block';
+            startGame('Mode2OptionsScene'); // Start the Mode 2 options scene
         });
     });
 
@@ -61,15 +65,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    function startGame() {
+    function startGame(scene) {
         var config = {
             type: Phaser.AUTO,
             width: 800,
             height: 600,
             parent: 'game-container',
-            scene: [OptionsScene, GameScene]
+            scene: [OptionsScene, GameScene, Mode2OptionsScene, Mode2Scene], // Add Mode2OptionsScene and Mode2Scene to the scene list
         };
 
         var game = new Phaser.Game(config);
+        game.scene.start(scene);
     }
 });

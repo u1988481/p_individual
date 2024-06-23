@@ -1,17 +1,19 @@
-export class GameScene extends Phaser.Scene {
+export class Mode2Scene extends Phaser.Scene {
     constructor() {
-        super({ key: 'GameScene' });
+        super({ key: 'Mode2Scene' });
     }
 
     init(data) {
-        this.pairs = data.pairs;
-        this.difficulty = data.difficulty;
+        this.level = data.level || 1;
+        this.points = data.points || 0;
+        this.pairs = data.pairs || 2;
+        this.flipDelay = data.flipDelay || 2000;
+        this.penalty = data.penalty || 15;
         this.cardBack = 'back';
         this.cardFaces = ['cb', 'co', 'sb', 'so', 'tb', 'to'];
         this.cards = [];
         this.flippedCards = [];
         this.pairsFound = 0;
-        this.points = 100;
     }
 
     preload() {
@@ -22,7 +24,8 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.text(400, 50, `Game Start: ${this.pairs} pairs, ${this.difficulty} difficulty`, { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
+        this.add.text(400, 30, `Nivell: ${this.level}`, { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
+        this.add.text(400, 60, `Punts: ${this.points}`, { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
 
         let items = this.cardFaces.slice(0, this.pairs).concat(this.cardFaces.slice(0, this.pairs));
         Phaser.Utils.Array.Shuffle(items);
@@ -54,7 +57,7 @@ export class GameScene extends Phaser.Scene {
         }
 
         // Set a delay based on the difficulty level to flip the cards face-down
-        this.time.delayedCall(this.getFlipDelay(), () => {
+        this.time.delayedCall(this.flipDelay, () => {
             this.cards.forEach(card => this.setCardFaceDown(card));
         }, [], this);
     }
@@ -81,20 +84,11 @@ export class GameScene extends Phaser.Scene {
 
         if (first.frontFace === second.frontFace) {
             this.pairsFound++;
+            this.points += 10; // Add points for a correct match
             this.flippedCards = [];
 
             if (this.pairsFound === this.pairs) {
-                this.add.text(400, 300, 'Has guanyat!', { fontSize: '64px', fill: '#0f0' }).setOrigin(0.5);
-                let backButton = this.add.text(400, 400, 'Tornar al menú', { fontSize: '32px', fill: '#0f0', backgroundColor: '#4CAF50', padding: { left: 20, right: 20, top: 10, bottom: 10 }, borderColor: '#0f0', borderWidth: 2 }).setOrigin(0.5).setInteractive();
-                backButton.on('pointerover', () => {
-                    backButton.setStyle({ fill: '#ff0' });
-                });
-                backButton.on('pointerout', () => {
-                    backButton.setStyle({ fill: '#0f0' });
-                });
-                backButton.on('pointerdown', () => {
-                    location.reload();
-                });
+                this.levelUp();
             }
         } else {
             this.time.delayedCall(1000, () => {
@@ -102,48 +96,21 @@ export class GameScene extends Phaser.Scene {
                 this.flippedCards = [];
             });
 
-            this.updatePoints();
+            this.points -= this.penalty; // Subtract points for an incorrect match
+            if (this.points < 0) this.points = 0; // Ensure points don't go negative
         }
     }
 
-    getFlipDelay() {
-        switch (this.difficulty) {
-            case 'easy':
-                return 2000;
-            case 'normal':
-                return 1000;
-            case 'hard':
-                return 100;
-            default:
-                return 1000;
-        }
-    }
-
-    updatePoints() {
-        switch (this.difficulty) {
-            case 'easy':
-                this.points -= 15;
-                break;
-            case 'normal':
-                this.points -= 25;
-                break;
-            case 'hard':
-                this.points -= 50;
-                break;
+    levelUp() {
+        this.level++;
+        if (this.pairs < 6) {
+            this.pairs++; // Increase pairs up to a maximum of 6
+        } else if (this.flipDelay > 100) {
+            this.flipDelay -= 100; // Decrease delay with a minimum of 100ms
+        } else {
+            this.penalty += 5; // Increase penalty
         }
 
-        if (this.points <= 0) {
-            this.add.text(400, 300, 'Has perdut!', { fontSize: '64px', fill: '#f00' }).setOrigin(0.5);
-            let backButton = this.add.text(400, 400, 'Tornar al menú', { fontSize: '32px', fill: '#f00', backgroundColor: '#4CAF50', padding: { left: 20, right: 20, top: 10, bottom: 10 }, borderColor: '#f00', borderWidth: 2 }).setOrigin(0.5).setInteractive();
-            backButton.on('pointerover', () => {
-                backButton.setStyle({ fill: '#ff0' });
-            });
-            backButton.on('pointerout', () => {
-                backButton.setStyle({ fill: '#f00' });
-            });
-            backButton.on('pointerdown', () => {
-                location.reload();
-            });
-        }
+        this.scene.restart({ level: this.level, points: this.points, pairs: this.pairs, flipDelay: this.flipDelay, penalty: this.penalty });
     }
 }

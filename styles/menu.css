@@ -2,22 +2,20 @@ body {
     background-image: url("../resources/fons.jpg");
     background-position: center;
     background-attachment: fixed; /* Ensures the background image is static */
+    font-family: Arial, sans-serif;
+    color: #fff;
 }
 
 #container {
     margin-top: 150px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    text-align: center;
 }
 
-#title, .center {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+#game-container {
+    display: none;
 }
 
-button.center {
+button.center, .button-group button {
     width: 150px;
     height: 60px;
     margin-top: 30px;
@@ -30,7 +28,7 @@ button.center {
     transition: background-color 0.3s, border-color 0.3s, color 0.3s;
 }
 
-button.center:hover {
+button.center:hover, .button-group button:hover {
     background-color: #45a049;
     border-color: #2e7d32;
     color: yellow;
@@ -42,12 +40,6 @@ button.center:hover {
     font-size: 70px;
     margin-bottom: 50px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-#subtitle, .center {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 #subtitle {
@@ -76,10 +68,11 @@ button.center:hover {
     background-color: white;
     padding: 20px;
     border-radius: 10px;
+    color: black; /* Ensure text color is visible */
 }
 
 .button-group {
-    display: inline-flex;
-    align-items: center;
+    display: flex;
+    justify-content: center;
     gap: 10px;
 }
