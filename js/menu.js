@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadButton.addEventListener('click', function() {
       container.style.display = 'none'
       gameContainer.style.display = 'block'
-      startGame('LoadGameScene')
+      //show saved games list function
     })
   }
 
@@ -97,10 +97,19 @@ document.addEventListener('DOMContentLoaded', function() {
       width: 800,
       height: 600,
       parent: 'game-container',
-      scene: [OptionsScene, GameScene, Mode2OptionsScene, Mode2Scene, LoadGameScene] // Add LoadGameScene to the scene list
+      scene: [] // No initial scene
     }
 
     game = new Phaser.Game(config)
+
+    // Add all scenes manually
+    game.scene.add('OptionsScene', OptionsScene)
+    game.scene.add('GameScene', GameScene)
+    game.scene.add('Mode2OptionsScene', Mode2OptionsScene)
+    game.scene.add('Mode2Scene', Mode2Scene)
+    game.scene.add('LoadGameScene', LoadGameScene)
+
+    // Start the desired scene
     game.scene.start(scene)
   }
 })
