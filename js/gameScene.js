@@ -22,7 +22,10 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
-        this.add.text(400, 50, `Game Start: ${this.pairs} pairs, ${this.difficulty} difficulty`, { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
+        this.add.text(400, 50, `${this.pairs} parelles, dificultat ${this.difficulty}`, { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
+
+        // Create points text
+        this.pointsText = this.add.text(400, 100, `Punts: ${this.points}`, { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
 
         let items = this.cardFaces.slice(0, this.pairs).concat(this.cardFaces.slice(0, this.pairs));
         Phaser.Utils.Array.Shuffle(items);
@@ -131,6 +134,9 @@ export class GameScene extends Phaser.Scene {
                 this.points -= 50;
                 break;
         }
+
+        // Update points text
+        this.pointsText.setText(`Punts: ${this.points}`);
 
         if (this.points <= 0) {
             this.add.text(400, 300, 'Has perdut!', { fontSize: '64px', fill: '#f00' }).setOrigin(0.5);

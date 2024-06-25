@@ -4,16 +4,25 @@ body {
     background-attachment: fixed; /* Ensures the background image is static */
     font-family: Arial, sans-serif;
     color: #fff;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    overflow: hidden;
 }
 
 #container {
-    margin-top: 150px;
     text-align: center;
 }
 
 #game-container {
-    display: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 800px; /* Width of the game */
+    height: 600px; /* Height of the game */
+    position: absolute; /* Ensures it is positioned relative to the body */
 }
+
 
 button.center, .button-group button {
     width: 150px;

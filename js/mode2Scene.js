@@ -5,7 +5,7 @@ export class Mode2Scene extends Phaser.Scene {
   
     init(data) {
       this.level = data.level || 1
-      this.points = data.points || 0
+      this.points = data.points || 100
       this.pairs = data.pairs || 2
       this.flipDelay = data.flipDelay || 2000
       this.penalty = data.penalty || 15
@@ -109,7 +109,6 @@ export class Mode2Scene extends Phaser.Scene {
   
       if (first.frontFace === second.frontFace) {
         this.pairsFound++
-        this.points += 10 // Add points for a correct match
         this.flippedCards = []
   
         if (this.pairsFound === this.pairs) {
