@@ -4,8 +4,12 @@ body {
     background-attachment: fixed; /* Ensures the background image is static */
     font-family: Arial, sans-serif;
     color: #fff;
+    margin: 0;
+    overflow: hidden;
+    display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh; /* Ensures the body takes full height of the viewport */
 }
 
 #container {
@@ -13,7 +17,7 @@ body {
 }
 
 #game-container {
-    display: flex;
+    display: none; /* Hide initially */
     justify-content: center;
     align-items: center;
     width: 800px; /* Width of the game */
@@ -23,7 +27,6 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
 }
-
 
 button.center, .button-group button {
     width: 150px;
