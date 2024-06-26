@@ -1,3 +1,4 @@
+// gameScene.js
 export class GameScene extends Phaser.Scene {
     constructor() {
         super({ key: 'GameScene' });
@@ -10,8 +11,12 @@ export class GameScene extends Phaser.Scene {
         this.cardFaces = ['cb', 'co', 'sb', 'so', 'tb', 'to'];
         this.cards = [];
         this.flippedCards = [];
-        this.pairsFound = 0;
-        this.points = 100;
+        this.pairsFound = data.pairsFound || 0;
+        this.points = data.points || 100;
+        if (data.cardStates) {
+            this.cardStates = data.cardStates;
+        }
+        this.status = data.status || 'playing';
     }
 
     preload() {
@@ -56,13 +61,70 @@ export class GameScene extends Phaser.Scene {
             }
         }
 
-        // Set a delay based on the difficulty level to flip the cards face-down
-        this.time.delayedCall(this.getFlipDelay(), () => {
-            this.cards.forEach(card => this.setCardFaceDown(card));
-        }, [], this);
+        if (this.cardStates && this.cardStates.length > 0) {
+            // Restore the saved state of the cards
+            this.cards.forEach((card, index) => {
+                let savedCard = this.cardStates[index];
+                if (savedCard) {
+                    card.x = savedCard.x;
+                    card.y = savedCard.y;
+                    card.frontFace = savedCard.frontFace;
+                    card.flipped = savedCard.flipped;
+                    if (card.flipped) {
+                        card.setTexture(card.frontFace);
+                    } else {
+                        card.setTexture(this.cardBack);
+                    }
+                }
+            });
+        } else {
+            // Set a delay based on the difficulty level to flip the cards face-down
+            this.time.delayedCall(this.getFlipDelay(), () => {
+                this.cards.forEach(card => this.setCardFaceDown(card));
+            }, [], this);
+        }
+
+        // Add Save Button
+        this.saveButton = this.add.text(700, 20, 'Guardar', { fontSize: '24px', fill: '#fff', backgroundColor: '#4CAF50', padding: { left: 10, right: 10, top: 5, bottom: 5 }, borderColor: '#0f0', borderWidth: 2 }).setOrigin(0.5).setInteractive();
+        this.saveButton.setInteractive(false);
+        this.time.delayedCall(2000, () => {
+            this.saveButton.setInteractive(true);
+        });
+
+        this.saveButton.on('pointerover', () => {
+            this.saveButton.setStyle({ fill: '#ff0' });
+        });
+        this.saveButton.on('pointerout', () => {
+            this.saveButton.setStyle({ fill: '#fff' });
+        });
+        this.saveButton.on('pointerdown', () => {
+            if (this.status === 'playing') {
+                this.saveGame();
+            }
+        });
+
+        // Add Back to Menu Button
+        let backButton = this.add.text(100, 20, 'Tornar al menú', { fontSize: '24px', fill: '#fff', backgroundColor: '#4CAF50', padding: { left: 10, right: 10, top: 5, bottom: 5 }, borderColor: '#0f0', borderWidth: 2 }).setOrigin(0.5).setInteractive();
+        backButton.on('pointerover', () => {
+            backButton.setStyle({ fill: '#ff0' });
+        });
+        backButton.on('pointerout', () => {
+            backButton.setStyle({ fill: '#fff' });
+        });
+        backButton.on('pointerdown', () => {
+            this.scene.stop('GameScene');
+            location.reload();
+        });
+
+        if (this.status === 'won') {
+            this.showEndMessage('Has guanyat!', '#0f0');
+        } else if (this.status === 'lost') {
+            this.showEndMessage('Has perdut!', '#f00');
+        }
     }
 
     flipCard(card) {
+        if (this.status !== 'playing') return; // Prevent interaction if game is over
         if (this.flippedCards.length < 2 && !card.flipped) {
             card.setTexture(card.frontFace);
             card.flipped = true;
@@ -87,17 +149,8 @@ export class GameScene extends Phaser.Scene {
             this.flippedCards = [];
 
             if (this.pairsFound === this.pairs) {
-                this.add.text(400, 300, 'Has guanyat!', { fontSize: '64px', fill: '#0f0' }).setOrigin(0.5);
-                let backButton = this.add.text(400, 400, 'Tornar al menú', { fontSize: '32px', fill: '#0f0', backgroundColor: '#4CAF50', padding: { left: 20, right: 20, top: 10, bottom: 10 }, borderColor: '#0f0', borderWidth: 2 }).setOrigin(0.5).setInteractive();
-                backButton.on('pointerover', () => {
-                    backButton.setStyle({ fill: '#ff0' });
-                });
-                backButton.on('pointerout', () => {
-                    backButton.setStyle({ fill: '#0f0' });
-                });
-                backButton.on('pointerdown', () => {
-                    location.reload();
-                });
+                this.status = 'won';
+                this.showEndMessage('Has guanyat!', '#0f0');
             }
         } else {
             this.time.delayedCall(1000, () => {
@@ -139,17 +192,38 @@ export class GameScene extends Phaser.Scene {
         this.pointsText.setText(`Punts: ${this.points}`);
 
         if (this.points <= 0) {
-            this.add.text(400, 300, 'Has perdut!', { fontSize: '64px', fill: '#f00' }).setOrigin(0.5);
-            let backButton = this.add.text(400, 400, 'Tornar al menú', { fontSize: '32px', fill: '#f00', backgroundColor: '#4CAF50', padding: { left: 20, right: 20, top: 10, bottom: 10 }, borderColor: '#f00', borderWidth: 2 }).setOrigin(0.5).setInteractive();
-            backButton.on('pointerover', () => {
-                backButton.setStyle({ fill: '#ff0' });
-            });
-            backButton.on('pointerout', () => {
-                backButton.setStyle({ fill: '#f00' });
-            });
-            backButton.on('pointerdown', () => {
-                location.reload();
-            });
+            this.status = 'lost';
+            this.showEndMessage('Has perdut!', '#f00');
         }
+    }
+
+    showEndMessage(message, color) {
+        this.add.text(400, 300, message, { fontSize: '64px', fill: color }).setOrigin(0.5);
+        this.saveButton.disableInteractive(); // Disable save button
+        this.cards.forEach(card => card.removeInteractive()); // Disable interaction with all cards
+    }
+
+    saveGame() {
+        const savedGames = JSON.parse(localStorage.getItem('savedGames')) || [];
+        const gameState = {
+            mode: 'GameScene',
+            data: {
+                pairs: this.pairs,
+                difficulty: this.difficulty,
+                points: this.points,
+                pairsFound: this.pairsFound,
+                cardStates: this.cards.map(card => ({
+                    x: card.x,
+                    y: card.y,
+                    frontFace: card.frontFace,
+                    flipped: card.flipped
+                })),
+                status: this.status // Add game status to save
+            }
+        };
+        savedGames.push(gameState);
+        if (savedGames.length > 3) savedGames.shift(); // Keep only the last 3 saved games
+        localStorage.setItem('savedGames', JSON.stringify(savedGames));
+        alert("Partida guardada!");
     }
 }
